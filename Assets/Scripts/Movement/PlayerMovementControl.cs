@@ -14,6 +14,8 @@ public class PlayerMovementControl : MovementControl
     private SkillsControl _skills;
     private Animator _animator;
 
+    private bool _isRun;
+
     private void Awake()
     {
         _agent = GetComponent<NavMeshAgent>();
@@ -32,10 +34,25 @@ public class PlayerMovementControl : MovementControl
 
     private void MoveToCursor(InputAction.CallbackContext callback)
     {
-        _agent.isStopped = true;
+        _isRun = true;
+        _agent.enabled = true;
+        _agent.isStopped = false;
         _skills?.CancelAllSkills();
         _animator?.SetTrigger("move");
         _agent.SetDestination(SurfaceMouse.Position);
+    }
+
+    private void Update()
+    {
+        if (
+            _isRun 
+            && (transform.position - _agent.destination).sqrMagnitude 
+                <= Mathf.Pow(_agent.stoppingDistance, 2)
+        )
+        {
+            _isRun = false;
+            _animator?.SetTrigger("idle");
+        }
     }
 
     private void OnDisable()
@@ -46,5 +63,6 @@ public class PlayerMovementControl : MovementControl
     public override void Stop()
     {
         _agent.isStopped = true;
+        _agent.enabled = false;
     }
 }

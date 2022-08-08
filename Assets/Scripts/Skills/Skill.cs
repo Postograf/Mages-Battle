@@ -5,64 +5,113 @@ using UnityEngine.UI;
 
 public enum SkillPhase
 {
-    Deactivated,
+    Ready,
     WaitingDelay,
     Activated,
     Holding,
-    Ended
+    Ended,
+    InCooldown
 }
 
+[RequireComponent(typeof(Stats))]
 public abstract class Skill : MonoBehaviour
 {
     [SerializeField] protected string _name;
-    [SerializeField] protected Image _icon;
+    [SerializeField] protected Sprite _icon;
     [SerializeField] protected string _description;
-    [SerializeField] protected int _manaCost;
+    [SerializeField] protected float _manaCost;
     [SerializeField] protected float _cooldown;
     [SerializeField] protected float _delay;
     [SerializeField] protected bool _cancellable;
 
+    protected Stats _stats;
     protected float _pastDelay;
+    protected float _currentCooldown;
 
     public string Name => _name;
-    public Image Icon => _icon;
+    public Sprite Icon => _icon;
     public string Description => _description;
-    public int ManaCost => _manaCost;
+    public float ManaCost => _manaCost;
     public float Cooldown => _cooldown;
     public float Delay => _delay;
     public bool Cancellable => _cancellable;
 
     public SkillPhase Phase { get; protected set; }
 
-    public virtual void WaitDelay()
+    private void Awake()
     {
-        if (_delay <= 0)
-        {
-            Phase = SkillPhase.Activated;
-            Activate();
-        }
-        else
-        {
-            Phase = SkillPhase.WaitingDelay;
-            _pastDelay = 0f;
-        }
+        _stats = GetComponent<Stats>();
     }
 
-    public virtual void Activate()
+    public virtual bool Press()
+    {
+        if (Phase == SkillPhase.Ready && _stats.SkillCast(_manaCost))
+        {
+            if (_delay <= 0)
+            {
+                Phase = SkillPhase.Activated;
+                Activate();
+            }
+            else
+            {
+                Phase = SkillPhase.WaitingDelay;
+                _pastDelay = 0f;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    protected virtual void Activate()
     {
         Phase = SkillPhase.Holding;
     }
 
-    protected abstract void Hold(float deltaTime);
-
-    public virtual void End()
+    protected virtual void Hold(float deltaTime)
     {
-        Phase = SkillPhase.Deactivated;
+        Phase = SkillPhase.Ended;
+        End();
+    }
+
+    public virtual bool Unpress()
+    {
+        if (Phase != SkillPhase.Ready && Phase != SkillPhase.InCooldown)
+        {
+            Phase = SkillPhase.Ended;
+            End();
+            return true;
+        }
+
+        return false;
+    }
+
+    protected virtual void End()
+    {
+        StartCooldown();
+    }
+
+    protected void StartCooldown()
+    {
+        if (_cooldown > 0)
+        {
+            _currentCooldown = _cooldown;
+            Phase = SkillPhase.InCooldown;
+        }
     }
 
     protected virtual void Update()
     {
-        if (Phase == SkillPhase.WaitingDelay)
+        if (Phase == SkillPhase.InCooldown)
+        {
+            _currentCooldown -= Time.deltaTime;
+            if (_currentCooldown <= 0)
+            {
+                Phase = SkillPhase.Ready;
+            }
+        }
+        else if (Phase == SkillPhase.WaitingDelay)
         {
             _pastDelay += Time.deltaTime;
             if (_pastDelay >= _delay)
@@ -81,7 +130,7 @@ public abstract class Skill : MonoBehaviour
     {
         if (_cancellable)
         {
-            Phase = SkillPhase.Deactivated;
+            Phase = SkillPhase.Ready;
         }
     }
 }

@@ -11,6 +11,11 @@ public class SkillsControl : MonoBehaviour
     public Skill[] Skills => _skills;
     public HashSet<Skill> ActivatedSkills { get; protected set; }
 
+    protected virtual void Awake()
+    {
+        ActivatedSkills = new HashSet<Skill>();
+    }
+
     public virtual void CancelAllSkills()
     {
         foreach (var skill in ActivatedSkills)

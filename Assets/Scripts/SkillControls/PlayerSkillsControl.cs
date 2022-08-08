@@ -10,8 +10,10 @@ public class PlayerSkillsControl : SkillsControl
     private Animator _animator;
     private MovementControl _movement;
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
+
         _inputs = new PlayerInputs();
         _animator = GetComponent<Animator>();
         _movement = GetComponent<MovementControl>();
@@ -25,25 +27,25 @@ public class PlayerSkillsControl : SkillsControl
 
         for (int i = 0; i < _skillInputs.Length && i < Skills.Length; i++)
         {
+            var skill = Skills[i];
             _skillInputs[i].performed += (a) =>
             {
-                var skill = Skills[i];
-                skill.WaitDelay();
-                ActivatedSkills.Add(skill);
-                _animator?.SetTrigger($"skill {i} start");
-
-                if (skill.Cancellable)
+                if (skill.Press())
                 {
-                    _movement?.Stop();
+                    ActivatedSkills.Add(skill);
+                    _animator?.SetTrigger($"skill {i} start");
+
+                    if (skill.Cancellable)
+                    {
+                        _movement?.Stop();
+                    }
                 }
             };
 
             _skillInputs[i].canceled += (a) =>
             {
-                var skill = Skills[i];
-                if (ActivatedSkills.Contains(skill))
+                if (ActivatedSkills.Contains(skill) && skill.Unpress())
                 {
-                    skill.End();
                     ActivatedSkills.Remove(skill);
                     _animator?.SetTrigger($"skill {i} ended");
                 }

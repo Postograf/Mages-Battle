@@ -15,7 +15,7 @@ public class Stats : MonoBehaviour, IDamageable
     public float Health
     {
         get => _health.Current;
-        private set
+        protected set
         {
             _health.Current = value;
             NotifyHealthChanges();
@@ -35,7 +35,7 @@ public class Stats : MonoBehaviour, IDamageable
     public float Mana
     {
         get => _mana.Current;
-        private set
+        protected set
         {
             _mana.Current = value;
             NotifyManaChanges();
@@ -68,7 +68,7 @@ public class Stats : MonoBehaviour, IDamageable
     public event Action Died;
     public event Action<float, float> ManaChanged;
 
-    public virtual void ApplyDamage(int damage, Vector3 from)
+    public virtual void ApplyDamage(float damage, Vector3 from)
     {
         if (Random.Range(1, 101) > _evadeChance)
         {
@@ -102,7 +102,7 @@ public class Stats : MonoBehaviour, IDamageable
         return false;
     }
 
-    private void NotifyHealthChanges()
+    protected virtual void NotifyHealthChanges()
     {
         HealthChanged?.Invoke(_health.Current, _health.Max);
         if (_health.Current <= 0)
@@ -111,7 +111,7 @@ public class Stats : MonoBehaviour, IDamageable
         }
     }
 
-    private void NotifyManaChanges()
+    protected virtual void NotifyManaChanges()
     {
         ManaChanged?.Invoke(_mana.Current, _mana.Max);
     }

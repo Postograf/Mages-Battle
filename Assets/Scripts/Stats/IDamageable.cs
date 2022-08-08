@@ -4,5 +4,5 @@ using UnityEngine;
 
 public interface IDamageable
 {
-    public void ApplyDamage(int damage, Vector3 from);
+    public void ApplyDamage(float damage, Vector3 from);
 }
