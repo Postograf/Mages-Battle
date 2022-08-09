@@ -8,6 +8,7 @@ public class WallState : IceFairyState
     [SerializeField] private float _speed;
     [SerializeField] private float _lifeTime;
 
+    private List<MovementControl> _controledUnits;
     private List<Collider> _ignoredColliders;
     private float _currentLifeTime;
     private Rigidbody _rigidbody;
@@ -20,6 +21,7 @@ public class WallState : IceFairyState
         _colliders = _view.GetComponents<Collider>();
         _rigidbody = GetComponent<Rigidbody>();
         _ignoredColliders = new List<Collider>();
+        _controledUnits = new List<MovementControl>();
     }
 
     protected override void OnEnable()
@@ -27,16 +29,27 @@ public class WallState : IceFairyState
         base.OnEnable();
 
         _currentLifeTime = 0;
-        _rigidbody.useGravity = true;
     }
 
-    private void OnCollisionStay(Collision collision)
+    private void OnCollisionEnter(Collision collision)
     {
         if (enabled == false) return;
 
         if (collision.gameObject.TryGetComponent(out MovementControl control))
         {
+            _controledUnits.Add(control);
             control.Stop();
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (enabled == false) return;
+
+        if (collision.gameObject.TryGetComponent(out MovementControl control))
+        {
+            _controledUnits.Remove(control);
+            control.Activate();
         }
     }
 
@@ -49,6 +62,11 @@ public class WallState : IceFairyState
         }
 
         _rigidbody.velocity = transform.forward * _speed;
+
+        foreach (var unit in _controledUnits)
+        {
+            unit.Stop();
+        }
     }
 
     public override void BecomeWall(GameObject sender, Vector3 from, Vector3 to)
@@ -59,6 +77,11 @@ public class WallState : IceFairyState
         foreach (var collider in _colliders)
         {
             Physics.IgnoreCollision(collider, senderCollider, true);
+        }
+
+        if (sender.TryGetComponent(out MovementControl control))
+        {
+            control.Activate();
         }
     }
 
@@ -74,8 +97,14 @@ public class WallState : IceFairyState
             }
         }
 
+        foreach (var unit in _controledUnits)
+        {
+            unit.Stop();
+        }
+
+        _controledUnits.Clear();
         _ignoredColliders.Clear();
-        _rigidbody.useGravity = false;
+        _rigidbody.velocity = Vector3.zero;
 
         base.OnDisable();
     }

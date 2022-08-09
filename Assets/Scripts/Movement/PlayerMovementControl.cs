@@ -16,8 +16,10 @@ public class PlayerMovementControl : MovementControl
 
     private bool _isRun;
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
+
         _agent = GetComponent<NavMeshAgent>();
         _skills = GetComponent<SkillsControl>();
         _animator = GetComponent<Animator>();
@@ -25,6 +27,8 @@ public class PlayerMovementControl : MovementControl
         _inputs = new PlayerInputs();
         _movement = _inputs.Game.Movement;
         _movement.performed += MoveToCursor;
+
+        Activate();
     }
 
     private void OnEnable()
@@ -35,8 +39,7 @@ public class PlayerMovementControl : MovementControl
     private void MoveToCursor(InputAction.CallbackContext callback)
     {
         _isRun = true;
-        _agent.enabled = true;
-        _agent.isStopped = false;
+        Activate();
         _skills?.CancelAllSkills();
         _animator?.SetTrigger("move");
         _agent.SetDestination(SurfaceMouse.Position);
@@ -60,9 +63,16 @@ public class PlayerMovementControl : MovementControl
         _movement.Disable();
     }
 
+    public override void Activate()
+    {
+        _agent.enabled = true;
+        _rigidbody.isKinematic = true;
+        _rigidbody.velocity = Vector3.zero;
+    }
+
     public override void Stop()
     {
-        _agent.isStopped = true;
         _agent.enabled = false;
+        _rigidbody.isKinematic = false;
     }
 }

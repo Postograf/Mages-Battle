@@ -866,7 +866,8 @@ GameObject:
   - component: {fileID: 5173434483817413888}
   - component: {fileID: 5173434483817413903}
   - component: {fileID: 5173434483817413902}
-  - component: {fileID: 5173434483817413889}
+  - component: {fileID: 7295265175201118582}
+  - component: {fileID: 10247307393607179}
   m_Layer: 0
   m_Name: FairyMage
   m_TagString: Untagged
@@ -1040,7 +1041,7 @@ MonoBehaviour:
   _skills:
   - {fileID: 5173434483817413888}
   - {fileID: 5173434483817413902}
-  - {fileID: 5173434483817413889}
+  - {fileID: 7295265175201118582}
 --- !u!114 &5173434483817413888
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1134,6 +1135,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 1
     m_RotationOrder: 4
+  _scaleByDamage: 0.01
 --- !u!114 &5173434483817413903
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1167,7 +1169,8 @@ MonoBehaviour:
   _cooldown: 10
   _delay: 0
   _cancellable: 0
---- !u!114 &5173434483817413889
+  _activatingState: 2
+--- !u!114 &7295265175201118582
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1176,7 +1179,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5289733789569285827}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c3de1aeed08093a46ad7789e3a64eb76, type: 3}
+  m_Script: {fileID: 11500000, guid: dea63b3aeff035d43851611fcb1bbb38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _name: "\u0422\u043E\u043B\u043A\u0430\u044E\u0449\u0430\u044F \u0441\u0442\u0435\u043D\u0430"
@@ -1186,6 +1189,23 @@ MonoBehaviour:
   _cooldown: 10
   _delay: 0
   _cancellable: 0
+  _activatingState: 1
+--- !u!54 &10247307393607179
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5289733789569285827}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 112
+  m_CollisionDetection: 0
 --- !u!1 &5289736638669298741
 GameObject:
   m_ObjectHideFlags: 0

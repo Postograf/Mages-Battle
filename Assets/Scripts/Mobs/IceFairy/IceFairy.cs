@@ -17,7 +17,7 @@ public class IceFairy : MonoBehaviour
 {
     [SerializeField] private StateByIdDictionary _statesById;
 
-    public IceFairyStateID CurrentState { get; private set; }
+    public IceFairyStateID State { get; private set; }
     public Transform Home { get; set; }
 
     private void Start()
@@ -27,17 +27,17 @@ public class IceFairy : MonoBehaviour
 
     public void BecomeWall(GameObject sender, Vector3 from, Vector3 to)
     {
-        _statesById[CurrentState].BecomeWall(sender, from, to);
+        _statesById[State].BecomeWall(sender, from, to);
     }
 
     public void BecomeShield(GameObject sender, Vector3 to)
     {
-        _statesById[CurrentState].BecomeShield(sender, to);
+        _statesById[State].BecomeShield(sender, to);
     }
 
     public void ChangeState(IceFairyStateID state)
     {
-        CurrentState = state;
+        State = state;
         foreach (var stateById in _statesById)
         {
             stateById.Value.enabled = stateById.Key == state;

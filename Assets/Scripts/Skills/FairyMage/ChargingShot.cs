@@ -9,6 +9,7 @@ public class ChargingShot : Skill
     [SerializeField] private Transform _firePoint;
     [SerializeField] private float _speed;
     [SerializeField] private AnimationCurve _damageCurve;
+    [SerializeField] private float _scaleByDamage;
 
     private Projectile _spawnedProjectile;
     private float _elapsedTime;
@@ -27,6 +28,8 @@ public class ChargingShot : Skill
         {
             _elapsedTime += deltaTime;
             _spawnedProjectile.Damage = _damageCurve.Evaluate(_elapsedTime);
+            _spawnedProjectile.transform.localScale =
+                Vector3.one * _scaleByDamage * _spawnedProjectile.Damage;
             Debug.Log(_spawnedProjectile.Damage);
             var target = SurfaceMouse.Position;
             target.y = transform.position.y;

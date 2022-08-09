@@ -98,6 +98,9 @@ public abstract class Skill : MonoBehaviour
         {
             _currentCooldown = _cooldown;
             Phase = SkillPhase.InCooldown;
+        } else
+        {
+            Phase = SkillPhase.Ready;
         }
     }
 

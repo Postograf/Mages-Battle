@@ -15,41 +15,25 @@ public class Stats : MonoBehaviour, IDamageable
     public float Health
     {
         get => _health.Current;
-        protected set
-        {
-            _health.Current = value;
-            NotifyHealthChanges();
-        }
+        protected set => _health.Current = value;
     }
 
     public float MaxHealth
     {
         get => _health.Max;
-        private set
-        {
-            _health.Max = value;
-            NotifyHealthChanges();
-        }
+        private set => _health.Max = value;
     }
 
     public float Mana
     {
         get => _mana.Current;
-        protected set
-        {
-            _mana.Current = value;
-            NotifyManaChanges();
-        }
+        protected set => _mana.Current = value;
     }
 
     public float MaxMana
     {
         get => _mana.Max;
-        private set
-        {
-            _mana.Max = value;
-            NotifyManaChanges();
-        }
+        private set => _mana.Max = value;
     }
 
     public int CritChance
@@ -68,6 +52,12 @@ public class Stats : MonoBehaviour, IDamageable
     public event Action Died;
     public event Action<float, float> ManaChanged;
 
+    private void Awake()
+    {
+        _health.Changed += NotifyHealthChanges;
+        _mana.Changed += NotifyManaChanges;
+    }
+
     public virtual void ApplyDamage(float damage, Vector3 from)
     {
         if (Random.Range(1, 101) > _evadeChance)
@@ -79,18 +69,16 @@ public class Stats : MonoBehaviour, IDamageable
     public void AddHealth(float value, Addition addition)
     {
         _health.Add(value, addition);
-        NotifyHealthChanges();
     }
 
     public void AddMana(float value, Addition addition)
     {
         _mana.Add(value, addition);
-        NotifyManaChanges();
     }
 
     public bool SkillCast(float cost)
     {
-        if (Health + Mana >= cost)
+        if (CanCast(cost))
         {
             var spentMana = Mathf.Clamp(cost, 0, Mana);
             var spentHealth = Mathf.Clamp(cost - spentMana, 0, Health);
@@ -102,7 +90,12 @@ public class Stats : MonoBehaviour, IDamageable
         return false;
     }
 
-    protected virtual void NotifyHealthChanges()
+    public bool CanCast(float cost)
+    {
+        return Health + Mana >= cost;
+    }
+
+    protected virtual void NotifyHealthChanges(float current, float max)
     {
         HealthChanged?.Invoke(_health.Current, _health.Max);
         if (_health.Current <= 0)
@@ -111,7 +104,7 @@ public class Stats : MonoBehaviour, IDamageable
         }
     }
 
-    protected virtual void NotifyManaChanges()
+    protected virtual void NotifyManaChanges(float current, float max)
     {
         ManaChanged?.Invoke(_mana.Current, _mana.Max);
     }

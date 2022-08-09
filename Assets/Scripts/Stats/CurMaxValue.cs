@@ -14,13 +14,20 @@ public enum Addition
 public class CurMaxValue
 {
     [SerializeField] private float _current;
+    [SerializeField] private float _max;
+
+    public event Action<float, float> Changed;
+
     public float Current
     {
         get => _current;
-        set => _current = Mathf.Clamp(value, 0, _max);
+        set
+        {
+            _current = Mathf.Clamp(value, 0, _max);
+            Changed?.Invoke(_current, _max);
+        }
     }
 
-    [SerializeField] private float _max;
     public float Max
     {
         get => _max;
@@ -31,6 +38,8 @@ public class CurMaxValue
             {
                 Current = _max;
             }
+
+            Changed?.Invoke(_current, _max);
         }
     }
 

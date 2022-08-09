@@ -5,20 +5,10 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody), typeof(Collider))]
 public class Projectile : MonoBehaviour
 {
-    [SerializeField] private float _scaleByDamage;
     private Rigidbody _rigidbody;
     private Collider _collider;
 
-    private float _damage;
-    public float Damage
-    {
-        get => _damage;
-        set
-        {
-            _damage = value;
-            transform.localScale = Vector3.one * _scaleByDamage * _damage;
-        }
-    }
+    public float Damage { get; set; }
 
     public float Speed { get; set; }
 
