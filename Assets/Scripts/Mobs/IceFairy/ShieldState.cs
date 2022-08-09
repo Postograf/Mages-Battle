@@ -7,14 +7,14 @@ using UnityEngine;
 public class ShieldState : IceFairyState
 {
     private Rigidbody _rigidbody;
-    private DefenceStructure _defenceStructure;
+    private TemporaryStructure _defenceStructure;
 
     protected override void Awake()
     {
         base.Awake();
 
         _rigidbody = GetComponent<Rigidbody>();
-        _defenceStructure = _view.GetComponent<DefenceStructure>();
+        _defenceStructure = _view.GetComponent<TemporaryStructure>();
         _defenceStructure.Died += () => IceFairy.ChangeState(IceFairyStateID.Fairy);
     }
 

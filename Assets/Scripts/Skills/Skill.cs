@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,18 +14,18 @@ public enum SkillPhase
     InCooldown
 }
 
-[RequireComponent(typeof(Stats))]
+[RequireComponent(typeof(Unit))]
 public abstract class Skill : MonoBehaviour
 {
     [SerializeField] protected string _name;
     [SerializeField] protected Sprite _icon;
-    [SerializeField] protected string _description;
+    [SerializeField, TextArea] protected string _description;
     [SerializeField] protected float _manaCost;
     [SerializeField] protected float _cooldown;
     [SerializeField] protected float _delay;
     [SerializeField] protected bool _cancellable;
 
-    protected Stats _stats;
+    protected Unit _unit;
     protected float _pastDelay;
     protected float _currentCooldown;
 
@@ -36,16 +37,20 @@ public abstract class Skill : MonoBehaviour
     public float Delay => _delay;
     public bool Cancellable => _cancellable;
 
+    public event Action<float> CooldownChanged;
+    public event Action ButtonPressed;
+    public event Action ButtonUnpressed;
+
     public SkillPhase Phase { get; protected set; }
 
     private void Awake()
     {
-        _stats = GetComponent<Stats>();
+        _unit = GetComponent<Unit>();
     }
 
     public virtual bool Press()
     {
-        if (Phase == SkillPhase.Ready && _stats.SkillCast(_manaCost))
+        if (Phase == SkillPhase.Ready && _unit.SkillCast(_manaCost))
         {
             if (_delay <= 0)
             {
@@ -57,6 +62,8 @@ public abstract class Skill : MonoBehaviour
                 Phase = SkillPhase.WaitingDelay;
                 _pastDelay = 0f;
             }
+
+            ButtonPressed?.Invoke();
 
             return true;
         }
@@ -81,6 +88,7 @@ public abstract class Skill : MonoBehaviour
         {
             Phase = SkillPhase.Ended;
             End();
+            NotifyButtonUnpressed();
             return true;
         }
 
@@ -109,6 +117,7 @@ public abstract class Skill : MonoBehaviour
         if (Phase == SkillPhase.InCooldown)
         {
             _currentCooldown -= Time.deltaTime;
+            NotifyCooldownChanged(_currentCooldown);
             if (_currentCooldown <= 0)
             {
                 Phase = SkillPhase.Ready;
@@ -134,6 +143,11 @@ public abstract class Skill : MonoBehaviour
         if (_cancellable)
         {
             Phase = SkillPhase.Ready;
+            NotifyButtonUnpressed();
         }
     }
+
+    protected void NotifyButtonPressed() => ButtonPressed?.Invoke();
+    protected void NotifyButtonUnpressed() => ButtonUnpressed?.Invoke();
+    protected void NotifyCooldownChanged(float cooldown) => CooldownChanged?.Invoke(cooldown);
 }

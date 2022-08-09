@@ -16,10 +16,11 @@ public class ActivateFairyState : Skill
 
     public override bool Press()
     {
-        if (Phase == SkillPhase.Ready && _stats.CanCast(_manaCost))
+        if (Phase == SkillPhase.Ready && _unit.CanCast(_manaCost))
         {
             Phase = SkillPhase.Activated;
             Activate();
+            NotifyButtonPressed();
             return true;
         }
 
@@ -48,7 +49,7 @@ public class ActivateFairyState : Skill
         {
             if (_isActive == false)
             {
-                _stats.SkillCast(_manaCost);
+                _unit.SkillCast(_manaCost);
                 _isActive = true;
             }
         }
@@ -60,5 +61,9 @@ public class ActivateFairyState : Skill
     }
 
     protected override void End() {}
-    public override bool Unpress() => true;
+    public override bool Unpress()
+    {
+        NotifyButtonUnpressed();
+        return true;
+    }
 }

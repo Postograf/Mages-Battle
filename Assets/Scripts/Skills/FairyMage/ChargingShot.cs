@@ -24,16 +24,18 @@ public class ChargingShot : Skill
 
     protected override void Hold(float deltaTime)
     {
-        if (_stats.SkillCast(_manaCostInHold))
+        if (_unit.SkillCast(_manaCostInHold * deltaTime))
         {
             _elapsedTime += deltaTime;
+
             _spawnedProjectile.Damage = _damageCurve.Evaluate(_elapsedTime);
             _spawnedProjectile.transform.localScale =
                 Vector3.one * _scaleByDamage * _spawnedProjectile.Damage;
-            Debug.Log(_spawnedProjectile.Damage);
+
             var target = SurfaceMouse.Position;
             target.y = transform.position.y;
             transform.LookAt(target);
+
             _spawnedProjectile.transform.position = _firePoint.position;
         }
     }
@@ -53,6 +55,7 @@ public class ChargingShot : Skill
         {
             _spawnedProjectile.Destroy();
             Phase = SkillPhase.Ready;
+            NotifyButtonUnpressed();
         }
     }
 }

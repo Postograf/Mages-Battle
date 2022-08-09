@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -47,11 +48,7 @@ public class PlayerMovementControl : MovementControl
 
     private void Update()
     {
-        if (
-            _isRun 
-            && (transform.position - _agent.destination).sqrMagnitude 
-                <= Mathf.Pow(_agent.stoppingDistance, 2)
-        )
+        if (_isRun && _agent.velocity.sqrMagnitude == 0)
         {
             _isRun = false;
             _animator?.SetTrigger("idle");

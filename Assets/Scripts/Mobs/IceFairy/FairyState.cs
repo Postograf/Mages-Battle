@@ -7,6 +7,7 @@ using UnityEngine;
 public class FairyState : IceFairyState
 {
     [SerializeField] private float _speed;
+    [SerializeField] private float _stopHomeDistance = 0.15f;
     [SerializeField] private float _minMoveHeight;
     [SerializeField] private float _rotationSpeed;
     [SerializeField] private float _distanceFromTargetForWall;
@@ -16,12 +17,14 @@ public class FairyState : IceFairyState
     private Rigidbody _rigidbody;
     private Sequence _sequence;
     private bool _isBecoming = false;
+    private float _sqrStopHomeDistance;
 
     protected override void Awake()
     {
         base.Awake();
 
         _rigidbody = GetComponent<Rigidbody>();
+        _sqrStopHomeDistance = _stopHomeDistance * _stopHomeDistance;
     }
 
     protected override void OnEnable()
@@ -35,12 +38,12 @@ public class FairyState : IceFairyState
 
     private void Update()
     {
-        if (_isBecoming == false)
+        var homePosition = IceFairy.Home.position;
+        var fairyPosition = transform.position;
+        var vectorToHome = homePosition - fairyPosition;
+        if (_isBecoming == false && vectorToHome.sqrMagnitude > _sqrStopHomeDistance)
         {
-            var homePosition = IceFairy.Home.position;
-            var fairyPosition = transform.position;
-            var directionToHome = (homePosition - fairyPosition).normalized;
-            transform.position += directionToHome * _speed * Time.deltaTime;
+            transform.position += vectorToHome.normalized * _speed * Time.deltaTime;
         }
     }
 
