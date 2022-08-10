@@ -140,7 +140,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &134710626
 RectTransform:
   m_ObjectHideFlags: 0
@@ -621,7 +621,7 @@ MonoBehaviour:
   _cancelButton: {fileID: 474096458}
   _runner: {fileID: 304514400}
   _gameScene: Game
-  _playerCount: 1
+  _playerCount: 2
 --- !u!1 &699462965
 GameObject:
   m_ObjectHideFlags: 0

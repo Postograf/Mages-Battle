@@ -9,22 +9,33 @@ public class ShieldState : IceFairyState
     private Rigidbody _rigidbody;
     private TemporaryStructure _defenceStructure;
 
-    protected override void Awake()
+    public override void Init()
     {
-        base.Awake();
+        base.Init();
 
         _rigidbody = GetComponent<Rigidbody>();
         _defenceStructure = _view.GetComponent<TemporaryStructure>();
-        _defenceStructure.Died += () => IceFairy.ChangeState(IceFairyStateID.Fairy);
+
+        if (!Object.HasStateAuthority) return;
+
+        if (
+            _defenceStructure.TryGetComponent(out Collider collider1)
+            && IceFairy.Owner.TryGetComponent(out Collider collider2)
+        )
+        {
+            Physics.IgnoreCollision(collider1, collider2, true);
+        }
+
+        _defenceStructure.Died += () => IceFairy.RPC_ChangeState(IceFairyStateID.Fairy);
     }
 
     protected override void OnEnable()
     {
-        _defenceStructure.FullRecover();
+        _defenceStructure?.FullRecover();
+        if (_rigidbody != null)
+        _rigidbody.useGravity = true;
 
         base.OnEnable();
-
-        _rigidbody.useGravity = true;
     }
 
     public override void BecomeShield(GameObject sender, Vector3 to)

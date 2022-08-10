@@ -1,17 +1,19 @@
 using DG.Tweening;
 
+using Fusion;
+
 using System.Collections;
 using System.Collections.Generic;
 
 using UnityEngine;
 
 [RequireComponent(typeof(IceFairy))]
-public abstract class IceFairyState : MonoBehaviour
+public abstract class IceFairyState : NetworkBehaviour
 {
     [SerializeField] protected GameObject _view;
     public IceFairy IceFairy { get; private set; }
 
-    protected virtual void Awake()
+    public virtual void Init()
     {
         IceFairy = GetComponent<IceFairy>();
     }

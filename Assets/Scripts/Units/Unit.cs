@@ -1,3 +1,5 @@
+using Fusion;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -5,7 +7,7 @@ using UnityEngine;
 
 using Random = UnityEngine.Random;
 
-public class Unit : MonoBehaviour, IDamageable
+public class Unit : NetworkBehaviour, IDamageable
 {
     [SerializeField] private CurMaxValue _health;
     [SerializeField] private CurMaxValue _mana;
@@ -58,7 +60,8 @@ public class Unit : MonoBehaviour, IDamageable
         _mana.Changed += NotifyManaChanges;
     }
 
-    public virtual void ApplyDamage(float damage, Vector3 from)
+    [Rpc]
+    public virtual void RPC_ApplyDamage(float damage, Vector3 from)
     {
         if (Random.Range(1, 101) > _evadeChance)
         {
@@ -66,12 +69,14 @@ public class Unit : MonoBehaviour, IDamageable
         }
     }
 
-    public void AddHealth(float value, Addition addition)
+    [Rpc]
+    public void RPC_AddHealth(float value, Addition addition)
     {
         _health.Add(value, addition);
     }
 
-    public void AddMana(float value, Addition addition)
+    [Rpc]
+    public void RPC_AddMana(float value, Addition addition)
     {
         _mana.Add(value, addition);
     }
@@ -80,14 +85,20 @@ public class Unit : MonoBehaviour, IDamageable
     {
         if (CanCast(cost))
         {
-            var spentMana = Mathf.Clamp(cost, 0, Mana);
-            var spentHealth = Mathf.Clamp(cost - spentMana, 0, Health);
-            Mana -= spentMana;
-            Health -= spentHealth;
+            RPC_SkillCast(cost);
             return true;
         }
 
         return false;
+    }
+
+    [Rpc]
+    public void RPC_SkillCast(float cost)
+    {
+        var spentMana = Mathf.Clamp(cost, 0, Mana);
+        var spentHealth = Mathf.Clamp(cost - spentMana, 0, Health);
+        Mana -= spentMana;
+        Health -= spentHealth;
     }
 
     public bool CanCast(float cost)

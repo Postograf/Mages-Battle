@@ -1,3 +1,5 @@
+using Fusion;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,7 +17,7 @@ public enum SkillPhase
 }
 
 [RequireComponent(typeof(Unit))]
-public abstract class Skill : MonoBehaviour
+public abstract class Skill : NetworkBehaviour
 {
     [SerializeField] protected string _name;
     [SerializeField] protected Sprite _icon;
@@ -105,6 +107,7 @@ public abstract class Skill : MonoBehaviour
         if (_cooldown > 0)
         {
             _currentCooldown = _cooldown;
+            NotifyCooldownChanged(_currentCooldown);
             Phase = SkillPhase.InCooldown;
         } else
         {
@@ -114,6 +117,8 @@ public abstract class Skill : MonoBehaviour
 
     protected virtual void Update()
     {
+        if (!Object.HasStateAuthority) return;
+
         if (Phase == SkillPhase.InCooldown)
         {
             _currentCooldown -= Time.deltaTime;

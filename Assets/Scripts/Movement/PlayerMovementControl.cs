@@ -1,3 +1,5 @@
+using Fusion;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,6 +18,10 @@ public class PlayerMovementControl : MovementControl
     private Animator _animator;
 
     private bool _isRun;
+    private float _sqrAgentStopping;
+
+    private const string _moveProperty = "move";
+    private const string _idleProperty = "idle";
 
     protected override void Awake()
     {
@@ -29,11 +35,14 @@ public class PlayerMovementControl : MovementControl
         _movement = _inputs.Game.Movement;
         _movement.performed += MoveToCursor;
 
+        _sqrAgentStopping = _agent.stoppingDistance * _agent.stoppingDistance;
+
         Activate();
     }
 
     private void OnEnable()
     {
+        Activate();
         _movement.Enable();
     }
 
@@ -42,21 +51,23 @@ public class PlayerMovementControl : MovementControl
         _isRun = true;
         Activate();
         _skills?.CancelAllSkills();
-        _animator?.SetTrigger("move");
+        _animator?.SetTrigger(_moveProperty);
         _agent.SetDestination(SurfaceMouse.Position);
     }
 
     private void Update()
     {
-        if (_isRun && _agent.velocity.sqrMagnitude == 0)
+        var sqrDistanceToTarget = (transform.position - _agent.destination).sqrMagnitude;
+        if (_isRun && sqrDistanceToTarget <= _sqrAgentStopping)
         {
             _isRun = false;
-            _animator?.SetTrigger("idle");
+            _animator?.SetTrigger(_idleProperty);
         }
     }
 
     private void OnDisable()
     {
+        Rpc_Stop();
         _movement.Disable();
     }
 
@@ -67,8 +78,10 @@ public class PlayerMovementControl : MovementControl
         _rigidbody.velocity = Vector3.zero;
     }
 
-    public override void Stop()
+    [Rpc]
+    public override void Rpc_Stop()
     {
+        _isRun = false;
         _agent.enabled = false;
         _rigidbody.isKinematic = false;
     }

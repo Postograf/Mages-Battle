@@ -1,3 +1,5 @@
+using Fusion;
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,6 +12,7 @@ public class ChargingShot : Skill
     [SerializeField] private float _speed;
     [SerializeField] private AnimationCurve _damageCurve;
     [SerializeField] private float _scaleByDamage;
+    [SerializeField] private float _critMultiplier = 2;
 
     private Projectile _spawnedProjectile;
     private float _elapsedTime;
@@ -17,7 +20,7 @@ public class ChargingShot : Skill
     protected override void Activate()
     {
         _elapsedTime = 0;
-        _spawnedProjectile = Instantiate(_projectile, _firePoint.position, Quaternion.identity);
+        _spawnedProjectile = Runner.Spawn(_projectile, _firePoint.position);
 
         Phase = SkillPhase.Holding;
     }
@@ -44,6 +47,11 @@ public class ChargingShot : Skill
     {
         base.End();
         _spawnedProjectile.Speed = _speed;
+        if (Random.Range(1, 101) <= _unit.CritChance)
+        {
+            _spawnedProjectile.Damage *= _critMultiplier;
+        }
+
         var target = SurfaceMouse.Position;
         target.y = _spawnedProjectile.transform.position.y;
         _spawnedProjectile.Launch(target - _spawnedProjectile.transform.position);

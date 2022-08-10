@@ -14503,6 +14503,8 @@ GameObject:
   - component: {fileID: 4149274713237240845}
   - component: {fileID: 3677106511109811296}
   - component: {fileID: 5982685341598707367}
+  - component: {fileID: 6801204461859471126}
+  - component: {fileID: 4055785751683285512}
   m_Layer: 0
   m_Name: Projectile
   m_TagString: Untagged
@@ -14616,4 +14618,55 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8beb245cd8b923b40a182230de26b3a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _scaleByDamage: 0.01
+  _interpolationDataSource: 0
+--- !u!114 &6801204461859471126
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7899481924742663479}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  InterpolationSpace: 0
+  InterpolationTarget: {fileID: 0}
+  InterpolateErrorCorrection: 1
+  InterpolatedErrorCorrectionSettings:
+    MinRate: 3.3
+    MaxRate: 10
+    PosBlendStart: 0.25
+    PosBlendEnd: 1
+    PosMinCorrection: 0.025
+    PosTeleportDistance: 2
+    RotBlendStart: 0.1
+    RotBlendEnd: 0.5
+    RotTeleportRadians: 1.5
+--- !u!114 &4055785751683285512
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7899481924742663479}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 0
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 1
+  AoiPositionSource: {fileID: 0}
+  Flags: 2305
+  NetworkGuid:
+    RawGuidValue: 09259d7c26a4a1a4e8bbef43267103f4
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 5982685341598707367}
+  - {fileID: 6801204461859471126}
+  SimulationBehaviours: []

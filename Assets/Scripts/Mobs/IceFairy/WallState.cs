@@ -14,9 +14,9 @@ public class WallState : IceFairyState
     private Rigidbody _rigidbody;
     private Collider[] _colliders;
 
-    protected override void Awake()
+    public override void Init()
     {
-        base.Awake();
+        base.Init();
 
         _colliders = _view.GetComponents<Collider>();
         _rigidbody = GetComponent<Rigidbody>();
@@ -33,18 +33,18 @@ public class WallState : IceFairyState
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (enabled == false) return;
+        if (enabled == false || !Object.HasStateAuthority) return;
 
         if (collision.gameObject.TryGetComponent(out MovementControl control))
         {
             _controledUnits.Add(control);
-            control.Stop();
+            control.Rpc_Stop();
         }
     }
 
     private void OnCollisionExit(Collision collision)
     {
-        if (enabled == false) return;
+        if (enabled == false || !Object.HasStateAuthority) return;
 
         if (collision.gameObject.TryGetComponent(out MovementControl control))
         {
@@ -55,17 +55,19 @@ public class WallState : IceFairyState
 
     private void FixedUpdate()
     {
+        if (!Object.HasStateAuthority) return;
+
         _currentLifeTime += Time.fixedDeltaTime;
         if (_currentLifeTime >= _lifeTime)
         {
-            IceFairy.ChangeState(IceFairyStateID.Fairy);
+            IceFairy.RPC_ChangeState(IceFairyStateID.Fairy);
         }
 
         _rigidbody.velocity = transform.forward * _speed;
 
         foreach (var unit in _controledUnits)
         {
-            unit.Stop();
+            unit.Rpc_Stop();
         }
     }
 
@@ -89,22 +91,25 @@ public class WallState : IceFairyState
 
     protected override void OnDisable()
     {
-        foreach (var ignoredCollider in _ignoredColliders)
+        if (Object.HasStateAuthority)
         {
-            foreach (var collider in _colliders)
+            foreach (var ignoredCollider in _ignoredColliders)
             {
-                Physics.IgnoreCollision(collider, ignoredCollider, false);
+                foreach (var collider in _colliders)
+                {
+                    Physics.IgnoreCollision(collider, ignoredCollider, false);
+                }
             }
-        }
 
-        foreach (var unit in _controledUnits)
-        {
-            unit.Stop();
-        }
+            foreach (var unit in _controledUnits)
+            {
+                unit.Rpc_Stop();
+            }
 
-        _controledUnits.Clear();
-        _ignoredColliders.Clear();
-        _rigidbody.velocity = Vector3.zero;
+            _controledUnits.Clear();
+            _ignoredColliders.Clear();
+            _rigidbody.velocity = Vector3.zero;
+        }
 
         base.OnDisable();
     }

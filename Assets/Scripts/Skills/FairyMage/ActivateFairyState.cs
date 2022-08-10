@@ -6,12 +6,12 @@ using UnityEngine;
 public class ActivateFairyState : Skill
 {
     [SerializeField] private IceFairyStateID _activatingState;
-    private IceFairy _iceFairy;
+    private IceFairySpawner _iceFairySpawner;
     private bool _isActive;
 
     private void Start()
     {
-        _iceFairy = GetComponent<IceFairySpawner>().IceFairy;
+        _iceFairySpawner = GetComponent<IceFairySpawner>();
     }
 
     public override bool Press()
@@ -31,21 +31,24 @@ public class ActivateFairyState : Skill
     {
         if (_activatingState == IceFairyStateID.Shield)
         {
-            _iceFairy?.BecomeShield(gameObject, SurfaceMouse.Position);
+            _iceFairySpawner.IceFairy?.BecomeShield(gameObject, SurfaceMouse.Position);
         }
         else if (_activatingState == IceFairyStateID.Wall)
         {
-            _iceFairy?.BecomeWall(gameObject, transform.position, SurfaceMouse.Position);
+            _iceFairySpawner.IceFairy?.BecomeWall(gameObject, transform.position, SurfaceMouse.Position);
         }
 
         Phase = SkillPhase.Ready;
+        NotifyButtonUnpressed();
     }
 
     protected override void Update()
     {
+        if (!Object.HasInputAuthority) return;
+
         base.Update();
 
-        if (_iceFairy.State == _activatingState)
+        if (_iceFairySpawner.IceFairy.State == _activatingState)
         {
             if (_isActive == false)
             {
@@ -61,9 +64,5 @@ public class ActivateFairyState : Skill
     }
 
     protected override void End() {}
-    public override bool Unpress()
-    {
-        NotifyButtonUnpressed();
-        return true;
-    }
+    public override bool Unpress() => true;
 }

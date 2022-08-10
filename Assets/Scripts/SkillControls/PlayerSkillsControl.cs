@@ -10,6 +10,9 @@ public class PlayerSkillsControl : SkillsControl
     private Animator _animator;
     private MovementControl _movement;
 
+    private const string _skillStartProperty = "skill {0} start";
+    private const string _skillEndedProperty = "skill {0} ended";
+
     protected override void Awake()
     {
         base.Awake();
@@ -28,16 +31,18 @@ public class PlayerSkillsControl : SkillsControl
         for (int i = 0; i < _skillInputs.Length && i < Skills.Length; i++)
         {
             var skill = Skills[i];
+            var skillStart = string.Format(_skillStartProperty, i + 1);
+            var skillEnded = string.Format(_skillEndedProperty, i + 1);
             _skillInputs[i].performed += (a) =>
             {
                 if (skill.Press())
                 {
                     ActivatedSkills.Add(skill);
-                    _animator?.SetTrigger($"skill {i} start");
+                    _animator?.SetTrigger(skillStart);
 
                     if (skill.Cancellable)
                     {
-                        _movement?.Stop();
+                        _movement?.Rpc_Stop();
                     }
                 }
             };
@@ -47,7 +52,7 @@ public class PlayerSkillsControl : SkillsControl
                 if (ActivatedSkills.Contains(skill) && skill.Unpress())
                 {
                     ActivatedSkills.Remove(skill);
-                    _animator?.SetTrigger($"skill {i} ended");
+                    _animator?.SetTrigger(skillEnded);
                 }
             };
         }

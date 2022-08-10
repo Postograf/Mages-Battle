@@ -1,9 +1,11 @@
+using Fusion;
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public abstract class MovementControl : MonoBehaviour
+public abstract class MovementControl : NetworkBehaviour
 {
     protected Rigidbody _rigidbody;
 
@@ -13,5 +15,5 @@ public abstract class MovementControl : MonoBehaviour
     }
 
     public abstract void Activate();
-    public abstract void Stop();
+    public abstract void Rpc_Stop();
 }

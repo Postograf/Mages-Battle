@@ -1,9 +1,11 @@
+using Fusion;
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody), typeof(Collider))]
-public class Projectile : MonoBehaviour
+public class Projectile : NetworkBehaviour
 {
     private Rigidbody _rigidbody;
     private Collider _collider;
@@ -21,9 +23,11 @@ public class Projectile : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        if (!Object.HasStateAuthority) return;
+
         if (collision.gameObject.TryGetComponent(out IDamageable damageable))
         {
-            damageable.ApplyDamage(Damage, transform.position);
+            damageable.RPC_ApplyDamage(Damage, transform.position);
         }
 
         Destroy();
@@ -37,6 +41,6 @@ public class Projectile : MonoBehaviour
 
     public void Destroy()
     {
-        Destroy(gameObject);
+        Runner.Despawn(Object);
     }
 }

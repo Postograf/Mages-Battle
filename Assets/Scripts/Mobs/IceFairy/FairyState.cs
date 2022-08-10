@@ -9,7 +9,7 @@ public class FairyState : IceFairyState
     [SerializeField] private float _speed;
     [SerializeField] private float _stopHomeDistance = 0.15f;
     [SerializeField] private float _minMoveHeight;
-    [SerializeField] private float _rotationSpeed;
+    [SerializeField] private float _wallDelay;
     [SerializeField] private float _distanceFromTargetForWall;
     [SerializeField] private float _heightForWall;
     [SerializeField] private float _heightForShield;
@@ -19,9 +19,10 @@ public class FairyState : IceFairyState
     private bool _isBecoming = false;
     private float _sqrStopHomeDistance;
 
-    protected override void Awake()
+
+    public override void Init()
     {
-        base.Awake();
+        base.Init();
 
         _rigidbody = GetComponent<Rigidbody>();
         _sqrStopHomeDistance = _stopHomeDistance * _stopHomeDistance;
@@ -38,6 +39,8 @@ public class FairyState : IceFairyState
 
     private void Update()
     {
+        if (!Object.HasStateAuthority || IceFairy?.Home is null) return;
+
         var homePosition = IceFairy.Home.position;
         var fairyPosition = transform.position;
         var vectorToHome = homePosition - fairyPosition;
@@ -56,12 +59,11 @@ public class FairyState : IceFairyState
         from.y = _minMoveHeight + oldY;
         to.y += _heightForWall;
         var durationToFrom = Vector3.Distance(from, transform.position) / _speed;
-        var rotationDuration = Vector3.Distance(to, from) / _rotationSpeed;
 
         _sequence = DOTween.Sequence()
             .Append(transform.DOMove(from, durationToFrom).SetEase(Ease.Linear))
-            .Append(transform.DOLookAt(to, rotationDuration).SetEase(Ease.Linear))
-            .OnComplete(() => IceFairy.ChangeState(IceFairyStateID.Wall));
+            .Append(transform.DOLookAt(to, _wallDelay).SetEase(Ease.Linear))
+            .OnComplete(() => IceFairy.RPC_ChangeState(IceFairyStateID.Wall));
     }
 
     public override void BecomeShield(GameObject sender, Vector3 to)
@@ -75,7 +77,7 @@ public class FairyState : IceFairyState
         _sequence = DOTween.Sequence()
             .Append(transform.DOMove(to, durationToTo).SetEase(Ease.Linear))
             .Append(transform.DOMove(targetHeight, durationToHeight).SetEase(Ease.Linear))
-            .OnComplete(() => IceFairy.ChangeState(IceFairyStateID.Shield));
+            .OnComplete(() => IceFairy.RPC_ChangeState(IceFairyStateID.Shield));
     }
 
     protected override void OnDisable()
